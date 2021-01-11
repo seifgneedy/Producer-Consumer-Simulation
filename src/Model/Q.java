@@ -29,4 +29,12 @@ public class Q {
 		}
 	}
 	
+	public Product getProduct(M m) {
+		
+	}
+	
+	public boolean isEmpty() {
+		return products.isEmpty();
+	}
+	
 }
