@@ -2,39 +2,61 @@ package Model;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
+import java.util.concurrent.*;
 
-public class Q {
+public class Q implements Runnable {
 	Queue<Product> products;
-	LinkedList<M> waitingMs;
+	LinkedList<M> machines;
+
 	public Q() {
-		products = new LinkedList<>();
-		waitingMs = new LinkedList<M>();
+		machines = new LinkedList<>();
+		products = new LinkedBlockingQueue<>();
 	}
-	public void attach(M machine) {
-		if(waitingMs.contains(machine)) {
-			return;
-		}
-		waitingMs.add(machine);
-	}	
-	
-	public void detach(M machine) {
-		waitingMs.remove(machine);
+
+	public Q(LinkedList<M> m) {
+		machines = m;
+		products = new LinkedBlockingDeque<>();
 	}
-	public void addProduct(Product product) {
-		products.add(product);
-		for (M m : waitingMs) {
-			if(m.consume()) {
-				return;
-			}
-		}
+
+	public void addMachine(M machine) {
+		machines.add(machine);
 	}
-	
-	public Product getProduct(M m) {
-		
+
+	public synchronized boolean addProduct(Product product) {
+		boolean boo = products.offer(product);
+		this.notify();
+		return boo;
 	}
-	
+
 	public boolean isEmpty() {
 		return products.isEmpty();
 	}
-	
+
+	@Override
+	public void run() {
+		for (;;) {
+			synchronized (this) {
+				while (products.isEmpty()) {
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+
+				Product product = products.poll();
+				int randomNum = new Random().nextInt(machines.size());
+				M machine = machines.get(randomNum);
+				while (machine.isWorking()) {
+					try {
+						this.wait(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				machine.processProduct(product);
+			}
+		}		
+	}
 }
