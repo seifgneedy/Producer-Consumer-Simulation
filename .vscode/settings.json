@@ -4,5 +4,10 @@
         "**/.project": true,
         "**/.settings": true,
         "**/.factorypath": true
-    }
+    },
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/home/seif/javafx/javafx-sdk-15.0.1/lib/javafx.*.jar"
+
+    ]
 }
