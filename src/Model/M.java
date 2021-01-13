@@ -1,7 +1,7 @@
 package Model;
 
 import java.util.*;
-import java.awt.Color;
+import javafx.scene.paint.Color;
 
 public class M implements Runnable {
 	private static final Color defaultColor = Color.GRAY;

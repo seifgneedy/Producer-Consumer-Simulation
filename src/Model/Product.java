@@ -1,12 +1,13 @@
 package Model;
 
-import java.awt.Color;
 import java.util.Random;
+
+import javafx.scene.paint.Color;
 
 public class Product {
 	private Color color;
 	public Product(){
-		color=new Color(new Random().nextInt(256),new Random().nextInt(256),new Random().nextInt(256));
+		color=Color.rgb(new Random().nextInt(256),new Random().nextInt(256),new Random().nextInt(256));
 	}
 	public Color getColor() {
 		return color;
