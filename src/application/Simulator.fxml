@@ -8,20 +8,20 @@
    <top>
       <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #838c9c;" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="95.0" text="Add Queue" />
-            <Button layoutX="120.0" layoutY="12.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="114.0" text="Add machine" />
+            <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#addQueue" prefHeight="26.0" prefWidth="95.0" text="Add Queue" />
+            <Button layoutX="120.0" layoutY="12.0" mnemonicParsing="false" onAction="#addMachine" prefHeight="26.0" prefWidth="114.0" text="Add machine" />
             <Button layoutX="924.0" layoutY="12.0" mnemonicParsing="false" onAction="#closeClicked" prefWidth="62.0" text="Close " />
-            <Button layoutX="245.0" layoutY="12.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="76.0" text="Connect" />
+            <Button layoutX="245.0" layoutY="12.0" mnemonicParsing="false" onAction="#connect" prefHeight="26.0" prefWidth="76.0" text="Connect" />
          </children>
       </AnchorPane>
    </top>
    <bottom>
       <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #838c9c;" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="127.0" text="Start Simulation" />
-            <Button layoutX="182.0" layoutY="12.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="153.0" text="Replay Simulation" />
-            <Button layoutX="389.0" layoutY="12.0" mnemonicParsing="false" text="Reset Simulation" />
-            <Button layoutX="901.0" layoutY="12.0" mnemonicParsing="false" text="Reset" />
+            <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#startSimulation" prefHeight="26.0" prefWidth="127.0" text="Start Simulation" />
+            <Button layoutX="182.0" layoutY="12.0" mnemonicParsing="false" onAction="#replaySimulation" prefHeight="26.0" prefWidth="153.0" text="Replay Simulation" />
+            <Button layoutX="389.0" layoutY="12.0" mnemonicParsing="false" onAction="#resetSimulation" text="Reset Simulation" />
+            <Button layoutX="901.0" layoutY="12.0" mnemonicParsing="false" onAction="#reset" text="Reset" />
          </children>
       </AnchorPane>
    </bottom>
