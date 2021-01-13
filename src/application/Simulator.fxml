@@ -4,14 +4,13 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SimulatorController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SimulatorController">
    <top>
       <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #838c9c;" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#addQueue" prefHeight="26.0" prefWidth="95.0" text="Add Queue" />
-            <Button layoutX="120.0" layoutY="12.0" mnemonicParsing="false" onAction="#addMachine" prefHeight="26.0" prefWidth="114.0" text="Add machine" />
-            <Button layoutX="924.0" layoutY="12.0" mnemonicParsing="false" onAction="#closeClicked" prefWidth="62.0" text="Close " />
-            <Button layoutX="245.0" layoutY="12.0" mnemonicParsing="false" onAction="#connect" prefHeight="26.0" prefWidth="76.0" text="Connect" />
+            <Button fx:id="addQButton" layoutX="14.0" layoutY="13.0" mnemonicParsing="false" onMouseClicked="#addQueue" prefHeight="26.0" prefWidth="95.0" style="-fx-background-color: #e5e5e5;" text="Add Queue" />
+            <Button fx:id="addMButton" layoutX="120.0" layoutY="13.0" mnemonicParsing="false" onAction="#addMachine" prefHeight="26.0" prefWidth="114.0" text="Add machine" />
+            <Button layoutX="724.0" layoutY="13.0" mnemonicParsing="false" onAction="#closeClicked" prefWidth="62.0" text="Close " />
          </children>
       </AnchorPane>
    </top>
@@ -20,12 +19,12 @@
          <children>
             <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#startSimulation" prefHeight="26.0" prefWidth="127.0" text="Start Simulation" />
             <Button layoutX="182.0" layoutY="12.0" mnemonicParsing="false" onAction="#replaySimulation" prefHeight="26.0" prefWidth="153.0" text="Replay Simulation" />
-            <Button layoutX="389.0" layoutY="12.0" mnemonicParsing="false" onAction="#resetSimulation" text="Reset Simulation" />
-            <Button layoutX="901.0" layoutY="12.0" mnemonicParsing="false" onAction="#reset" text="Reset" />
+            <Button layoutX="613.0" layoutY="13.0" mnemonicParsing="false" onAction="#resetSimulation" text="Reset Simulation" />
+            <Button layoutX="741.0" layoutY="13.0" mnemonicParsing="false" onAction="#reset" text="Reset" />
          </children>
       </AnchorPane>
    </bottom>
    <center>
-      <AnchorPane fx:id="canvas" style="-fx-border-color: #FFF;" BorderPane.alignment="CENTER" />
+      <AnchorPane fx:id="canvas" onMouseClicked="#onPaneClicked" style="-fx-border-color: #FFF;" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

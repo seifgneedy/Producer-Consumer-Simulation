@@ -28,7 +28,10 @@ public class Q implements Runnable {
 		this.notify();
 		return boo;
 	}
-
+	
+	public LinkedList<M> getMachines(){
+		return machines;
+	}
 	public boolean isEmpty() {
 		return products.isEmpty();
 	}

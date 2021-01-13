@@ -37,6 +37,9 @@ public class M implements Runnable {
 	public boolean isWorking() {
 		return currentProduct==null;
 	}
+	public Q getNextQ() {
+		return nextQ;
+	}
 
 	@Override
 	public void run() {
