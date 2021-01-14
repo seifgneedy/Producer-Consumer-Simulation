@@ -5,7 +5,9 @@ import java.util.*;
 import Model.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.*;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.*;
@@ -19,8 +21,6 @@ public class SimulatorController implements Initializable {
 	AnchorPane canvas;
 	@FXML
 	TextField textField;
-	@FXML
-	TextField timeText;
 	@FXML
 	Button addQButton;
 	@FXML
@@ -44,30 +44,30 @@ public class SimulatorController implements Initializable {
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		// TODO : write some code here.
-		//add start Q
+		// add start Q
 		Q q = new Q();
-    	qs.add(q);
-    	Rectangle r = new Rectangle(720,260, 80, 90);
-    	r.setFill(Color.DARKGOLDENROD);
-    	QueueText t = new QueueText(720 + 20, 300,"Start");
-    	t.setStyle("-fx-font-weight: bold");
+		qs.add(q);
+		Rectangle r = new Rectangle(720, 260, 80, 90);
+		r.setFill(Color.DARKGOLDENROD);
+		QueueText t = new QueueText(720 + 20, 300, "Start", canvas, careTaker);
+		t.setStyle("-fx-font-weight: bold");
 		t.setFill(Color.BLACK);
 		q.setqObserver(t);
-    	canvas.getChildren().add(r);
-    	canvas.getChildren().add(t);
-    	qTexts.add(t);
+		canvas.getChildren().add(r);
+		canvas.getChildren().add(t);
+		qTexts.add(t);
 		qRectangles.add(r);
 		r.setOnMouseReleased(ev -> {
 			int i = 0;
 			double x = ev.getSceneX();
 			double y = ev.getSceneY() - 50;
-			for(; i<mCircles.size(); i++) {
+			for (; i < mCircles.size(); i++) {
 				MachineCircle c = mCircles.get(i);
-				if( c.intersects(x, y, 1, 1)) {
-					if(!addQ && !addM && ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+				if (c.intersects(x, y, 1, 1)) {
+					if (!addQ && !addM && !q.getMachines().contains(ms.get(i))
+							&& (ms.get(i).getNextQ() == null || !ms.get(i).getNextQ().equals(q))) {
 						q.addMachine(ms.get(i));
-						Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
+						Arrow a = new Arrow(r.getX() + 20, r.getY() + 15, c.getCenterX(), c.getCenterY());
 						canvas.getChildren().add(a);
 					}
 				}
@@ -77,30 +77,32 @@ public class SimulatorController implements Initializable {
 			int i = 0;
 			double x = ev.getSceneX();
 			double y = ev.getSceneY() - 50;
-			for(; i<mCircles.size(); i++) {
+			for (; i < mCircles.size(); i++) {
 				MachineCircle c = mCircles.get(i);
-				if( c.intersects(x, y, 1, 1)) {
-					if(!addQ && !addM && ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+				if (c.intersects(x, y, 1, 1)) {
+					if (!addQ && !addM && !q.getMachines().contains(ms.get(i))
+							&& (ms.get(i).getNextQ() == null || !ms.get(i).getNextQ().equals(q))) {
 						q.addMachine(ms.get(i));
-						Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
+						Arrow a = new Arrow(r.getX() + 20, r.getY() + 15, c.getCenterX(), c.getCenterY());
 						canvas.getChildren().add(a);
 					}
 				}
 			}
 		});
+		// add end Queue
 		Q q2 = new Q();
-    	qs.add(q2);
-    	Rectangle r2 = new Rectangle(0,260, 80, 90);
-    	r2.setFill(Color.DARKCYAN);
-    	QueueText t2 = new QueueText(20, 300,"End");
-    	t2.setStyle("-fx-font-weight: bold");
+		qs.add(q2);
+		Rectangle r2 = new Rectangle(0, 260, 80, 90);
+		r2.setFill(Color.DARKCYAN);
+		QueueText t2 = new QueueText(20, 300, "End", canvas, careTaker);
+		t2.setStyle("-fx-font-weight: bold");
 		t2.setFill(Color.BLACK);
 		q2.setqObserver(t2);
-    	canvas.getChildren().add(r2);
-    	canvas.getChildren().add(t2);
-    	qTexts.add(t2);
-		qRectangles.add(r2);		
-		
+		canvas.getChildren().add(r2);
+		canvas.getChildren().add(t2);
+		qTexts.add(t2);
+		qRectangles.add(r2);
+
 		textField.textProperty().addListener((ChangeListener<? super String>) new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
@@ -109,102 +111,116 @@ public class SimulatorController implements Initializable {
 				}
 			}
 		});
-		timeText.textProperty().addListener((ChangeListener<? super String>) new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				if (!newValue.matches("\\d*")) {
-					timeText.setText(newValue.replaceAll("[^\\d]", ""));
-				}
-			}
-		});
-    }
-
-    @FXML
-    public void addQueue(){
-    	if(addQ) {
-    		addQ = false;
-    		addM = false;
-    		addQButton.setStyle(null);
-    	}else {
-    		if(addM)
-    			addMButton.setStyle(null);
-	        addQ=true;
-	        addM=false;
-	        addQButton.setStyle("-fx-background-color: #00cc44;");
-    	}
-    }
-
-    @FXML
-    public void addMachine(){
-    	if(addM) {
-    		addQ = false;
-    		addM = false;
-    		addMButton.setStyle(null);
-    	}else {
-    		if(addQ)
-    			addQButton.setStyle(null);
-	        addM=true;
-	        addQ=false;
-	        addMButton.setStyle("-fx-background-color: #00cc44;");
-    	}
 	}
-	
-	
-//	public void setMachineColor(M machine,Color color){
-//		int index= ms.indexOf(machine);
-//		mCircles.get(index).setFill(color);
-//		//Save snapshot
-//	}
 
-    @FXML
-    public void startSimulation(){
-    	qTexts.get(1).setText("0");
-    	timeText.setDisable(true);
-    	textField.setDisable(true);
-    	int numberOfProducts = Integer.parseInt(textField.getText());
-    	addQButton.setDisable(true);
-    	addMButton.setDisable(true);
-    	startSimulationButton.setDisable(true);
-    	replaySimulationButton.setDisable(true);
-		for(Q q:qs)
+	@FXML
+	public void addQueue() {
+		if (addQ) {
+			addQ = false;
+			addM = false;
+			addQButton.setStyle(null);
+		} else {
+			if (addM)
+				addMButton.setStyle(null);
+			addQ = true;
+			addM = false;
+			addQButton.setStyle("-fx-background-color: #00cc44;");
+		}
+	}
+
+	@FXML
+	public void addMachine() {
+		if (addM) {
+			addQ = false;
+			addM = false;
+			addMButton.setStyle(null);
+		} else {
+			if (addQ)
+				addQButton.setStyle(null);
+			addM = true;
+			addQ = false;
+			addMButton.setStyle("-fx-background-color: #00cc44;");
+		}
+	}
+
+	@FXML
+	public void startSimulation() {
+		qTexts.get(1).update("0");
+		textField.setDisable(true);
+		int numberOfProducts = Integer.parseInt(textField.getText());
+		addQButton.setDisable(true);
+		addMButton.setDisable(true);
+		startSimulationButton.setDisable(true);
+		replaySimulationButton.setDisable(true);
+		resetSimulatioButton.setDisable(true);
+		for (Q q : qs)
 			new Thread(q).start();
-		for(M m:ms)
+		for (M m : ms)
 			new Thread(m).start();
-		ProductFeeder pf = new ProductFeeder(qs.get(0), numberOfProducts, Integer.parseInt(timeText.getText()) * 1000 );
+		ProductFeeder pf = new ProductFeeder(qs.get(0), numberOfProducts);
 		new Thread(pf).start();
 		EndSimulationDetector esd = new EndSimulationDetector(this, qs.get(1), numberOfProducts);
 		new Thread(esd).start();
-    }
-    public void simulationEnded() {
-    	timeText.setDisable(false);
-    	textField.setDisable(false);
-		addQButton.setDisable(false);
-    	addMButton.setDisable(false);
-    	startSimulationButton.setDisable(false);
-    	replaySimulationButton.setDisable(false);
-    	qs.get(1).clearProducts();
-    }
+	}
 
-    @FXML
-    public void replaySimulation(){
-        
-    }
+	public void simulationEnded() {
+		textField.setDisable(false);
+		addQButton.setDisable(false);
+		addMButton.setDisable(false);
+		startSimulationButton.setDisable(false);
+		replaySimulationButton.setDisable(false);
+		resetSimulatioButton.setDisable(false);
+		qs.get(1).clearProducts();
+	}
+
+	@FXML
+	public void replaySimulation() {
+		Replay replay=new Replay(this);
+		new Thread(replay).start();
+		// for (int i = 0; i < careTaker.getSize() - 1; i++) {
+		// 	State firstState = careTaker.get(i).getState();
+		// 	State secondState = careTaker.get(i + 1).getState();
+		// 	long time = secondState.getTime() - firstState.getTime();
+		// 	Platform.runLater(new Runnable() {
+		// 		public void run() {
+		// 			try {
+		// 				Thread.sleep(time);
+		// 				updateCanvas(firstState.getList());
+		// 			} catch (InterruptedException e) {
+		// 				e.printStackTrace();
+		// 			}
+		// 		}
+		// 	});
+        // //     Task<Void> sleeper = new Task<Void>() {
+		// // 		@Override
+		// // 		protected Void call() throws Exception {
+		// // 			try {
+		// // 				System.out.println("Going to sleep  "+time);
+
+		// // 				Thread.sleep(time);
+		// // 			} catch (InterruptedException e) {
+		// // 			}
+		// // 			return null;
+		// // 		}
+		// // 	};
+		// // 	new Thread(sleeper).start();
+        //  }
+        // State lastState=careTaker.get(careTaker.getSize()-1).getState();
+        // updateCanvas(lastState.getList());
+	}
+	
+	public void updateCanvas(ObservableList<Node> list){
+		canvas.getChildren().clear();
+		for(Node node : list){
+			canvas.getChildren().add(node);
+		}
+		System.out.println("canvas updated0564");
+	}
 
     @FXML
     public void resetSimulation(){
         careTaker = new CareTaker();
     }
-
-
-    // @FXML 
-    // public void reset(){
-    //     careTaker = new CareTaker();
-	// 	clearCanvas();
-    //     ms=new ArrayList<>();
-    //     qs=new ArrayList<>();
-    //     mCircles=new ArrayList<>();
-    //     qRectangles=new ArrayList<>();
-    // }
     
     @FXML
     public void onPaneClicked(MouseEvent e) {
@@ -227,7 +243,7 @@ public class SimulatorController implements Initializable {
 	    		qs.add(q);
 	    		Rectangle r = new Rectangle(e.getSceneX(), e.getSceneY()-50, 40, 30);
 	    		r.setFill(Color.rgb(251, 251, 1));
-	    		QueueText t = new QueueText(e.getSceneX() + 12, e.getSceneY()-30,"Q"+(qs.size()-1));
+	    		QueueText t = new QueueText(e.getSceneX() + 12, e.getSceneY()-30,"Q"+(qs.size()-1),canvas,careTaker);
 	    		t.setStyle("-fx-font-weight: bold");
 				t.setFill(Color.BLUE);
 				q.setqObserver(t);
@@ -268,7 +284,7 @@ public class SimulatorController implements Initializable {
 	    	} else if(addM) {
 	    		M m = new M();
 	    		ms.add(m);
-	    		MachineCircle c = new MachineCircle(e.getSceneX(), e.getSceneY()-50, 20);
+	    		MachineCircle c = new MachineCircle(e.getSceneX(), e.getSceneY()-50, 20,canvas,careTaker);
 				mCircles.add(c);
 				c.setFill(m.getColor());
 				m.setObserver(c);

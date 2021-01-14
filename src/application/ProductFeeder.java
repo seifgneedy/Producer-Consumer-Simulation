@@ -1,5 +1,7 @@
 package application;
 
+import java.util.Random;
+
 import Model.Product;
 import Model.Q;
 
@@ -7,11 +9,9 @@ public class ProductFeeder implements Runnable {
 	
 	private Q q;
 	int numberOfProducts;
-	long time;
-	public ProductFeeder(Q q, int n, long time) {
+	public ProductFeeder(Q q, int n) {
 		this.q = q;
 		this.numberOfProducts = n;
-		this.time = time;
 	}
 	
 	@Override
@@ -19,7 +19,7 @@ public class ProductFeeder implements Runnable {
 		for(int i=1; i <= numberOfProducts; i++) {
 			try {
 				q.addProduct(new Product());
-				Thread.sleep(time);
+				Thread.sleep(new Random().nextInt(4500)+500);
 			} catch (InterruptedException e) {e.printStackTrace();}
 		}
 		
