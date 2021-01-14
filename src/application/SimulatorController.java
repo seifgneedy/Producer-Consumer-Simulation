@@ -3,8 +3,11 @@ package application;
 import java.net.URL;
 import java.util.*;
 import Model.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -12,35 +15,100 @@ import javafx.scene.shape.*;
 import javafx.scene.text.*;
 
 public class SimulatorController implements Initializable {
-    @FXML 
-    AnchorPane canvas;
-    
-    @FXML
-    Button addQButton;
-    @FXML
-    Button addMButton;
-    @FXML
-    Button startSimulationButton;
-    @FXML
-    Button replaySimulationButton;
-    @FXML
-    Button resetSimulatioButton;
-    @FXML
-    Button resetButton;
+	@FXML
+	AnchorPane canvas;
+	@FXML
+	TextField textField;
+	@FXML
+	Button addQButton;
+	@FXML
+	Button addMButton;
+	@FXML
+	Button startSimulationButton;
+	@FXML
+	Button replaySimulationButton;
+	@FXML
+	Button resetSimulatioButton;
+	@FXML
+	Button resetButton;
 
-    CareTaker careTaker=new CareTaker();
-    Originator originator=new Originator();
+	CareTaker careTaker = new CareTaker();
+	Originator originator = new Originator();
 
-    boolean addQ,addM;
-    List<Rectangle> qRectangles=new ArrayList<>();
-    List<Text> qTexts = new ArrayList<>();
-    List<Circle> mCircles=new ArrayList<>();
-    List<M> ms = new ArrayList<>();
-    List<Q> qs=new ArrayList<>();
-    @Override
-    public void initialize(URL arg0, ResourceBundle arg1) {
-        //TODO : write some code here.
-        canvas.getChildren();
+	boolean addQ, addM;
+	List<Rectangle> qRectangles = new ArrayList<>();
+	List<QueueText> qTexts = new ArrayList<>();
+	List<MachineCircle> mCircles = new ArrayList<>();
+	List<M> ms = new ArrayList<>();
+	List<Q> qs = new ArrayList<>();
+
+	@Override
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		// TODO : write some code here.
+		//add start Q
+		Q q = new Q();
+    	qs.add(q);
+    	Rectangle r = new Rectangle(720,260, 80, 90);
+    	r.setFill(Color.DARKGOLDENROD);
+    	QueueText t = new QueueText(720 + 20, 300,"Start");
+    	t.setStyle("-fx-font-weight: bold");
+		t.setFill(Color.BLACK);
+		q.setqObserver(t);
+    	canvas.getChildren().add(r);
+    	canvas.getChildren().add(t);
+    	qTexts.add(t);
+		qRectangles.add(r);
+		r.setOnMouseReleased(ev -> {
+			int i = 0;
+			double x = ev.getSceneX();
+			double y = ev.getSceneY() - 50;
+			for(; i<mCircles.size(); i++) {
+				MachineCircle c = mCircles.get(i);
+				if( c.intersects(x, y, 1, 1)) {
+					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+						q.addMachine(ms.get(i));
+						Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
+						canvas.getChildren().add(a);
+					}
+				}
+			}
+		});
+		t.setOnMouseReleased(ev -> {
+			int i = 0;
+			double x = ev.getSceneX();
+			double y = ev.getSceneY() - 50;
+			for(; i<mCircles.size(); i++) {
+				MachineCircle c = mCircles.get(i);
+				if( c.intersects(x, y, 1, 1)) {
+					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+						q.addMachine(ms.get(i));
+						Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
+						canvas.getChildren().add(a);
+					}
+				}
+			}
+		});
+		Q q2 = new Q();
+    	qs.add(q2);
+    	Rectangle r2 = new Rectangle(0,260, 80, 90);
+    	r2.setFill(Color.DARKCYAN);
+    	QueueText t2 = new QueueText(20, 300,"End");
+    	t2.setStyle("-fx-font-weight: bold");
+		t2.setFill(Color.BLACK);
+		q2.setqObserver(t2);
+    	canvas.getChildren().add(r2);
+    	canvas.getChildren().add(t2);
+    	qTexts.add(t2);
+		qRectangles.add(r2);		
+		
+		textField.textProperty().addListener((ChangeListener<? super String>) new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (!newValue.matches("\\d*")) {
+					textField.setText(newValue.replaceAll("[^\\d]", ""));
+				}
+			}
+		});
     }
 
     @FXML
@@ -71,15 +139,23 @@ public class SimulatorController implements Initializable {
 	        addQ=false;
 	        addMButton.setStyle("-fx-background-color: #00cc44;");
     	}
-    }
-
-    @FXML
-    public void connect(){
-
-    }
+	}
+	
+	@FXML 
+	public void setMachineColor(M machine,Color color){
+		int index= ms.indexOf(machine);
+		mCircles.get(index).setFill(color);
+		//Save snapshot
+	}
 
     @FXML
     public void startSimulation(){
+		for(Q q:qs)
+			new Thread(q).start();
+		for(M m:ms)
+			new Thread(m).start();
+		
+		
 
     }
 
@@ -94,15 +170,15 @@ public class SimulatorController implements Initializable {
     }
 
 
-    @FXML 
-    public void reset(){
-        careTaker = new CareTaker();
-        clearCanvas();
-        ms=new ArrayList<>();
-        qs=new ArrayList<>();
-        mCircles=new ArrayList<>();
-        qRectangles=new ArrayList<>();
-    }
+    // @FXML 
+    // public void reset(){
+    //     careTaker = new CareTaker();
+	// 	clearCanvas();
+    //     ms=new ArrayList<>();
+    //     qs=new ArrayList<>();
+    //     mCircles=new ArrayList<>();
+    //     qRectangles=new ArrayList<>();
+    // }
     
     @FXML
     public void onPaneClicked(MouseEvent e) {
@@ -111,19 +187,20 @@ public class SimulatorController implements Initializable {
     		qs.add(q);
     		Rectangle r = new Rectangle(e.getSceneX(), e.getSceneY()-50, 40, 30);
     		r.setFill(Color.rgb(251, 251, 1));
-    		Text t = new Text(e.getSceneX() + 12, e.getSceneY()-30,"Q"+(qs.size()-1));
+    		QueueText t = new QueueText(e.getSceneX() + 12, e.getSceneY()-30,"Q"+(qs.size()-1));
     		t.setStyle("-fx-font-weight: bold");
-    		t.setFill(Color.BLUE);
+			t.setFill(Color.BLUE);
+			q.setqObserver(t);
     		canvas.getChildren().add(r);
     		canvas.getChildren().add(t);
     		qTexts.add(t);
-    		qRectangles.add(r);
+			qRectangles.add(r);
     		r.setOnMouseReleased(ev -> {
-    			int i = 0;
+				int i = 0;
     			double x = ev.getSceneX();
     			double y = ev.getSceneY() - 50;
     			for(; i<mCircles.size(); i++) {
-    				Circle c = mCircles.get(i);
+    				MachineCircle c = mCircles.get(i);
     				if( c.intersects(x, y, 1, 1)) {
     					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
 	    					q.addMachine(ms.get(i));
@@ -138,7 +215,7 @@ public class SimulatorController implements Initializable {
     			double x = ev.getSceneX();
     			double y = ev.getSceneY() - 50;
     			for(; i<mCircles.size(); i++) {
-    				Circle c = mCircles.get(i);
+    				MachineCircle c = mCircles.get(i);
     				if( c.intersects(x, y, 1, 1)) {
     					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
 	    					q.addMachine(ms.get(i));
@@ -151,16 +228,17 @@ public class SimulatorController implements Initializable {
     	} else if(addM) {
     		M m = new M();
     		ms.add(m);
-    		Circle c = new Circle(e.getSceneX(), e.getSceneY()-50, 20);
-    		mCircles.add(c);
-    		c.setFill(m.getColor());
+    		MachineCircle c = new MachineCircle(e.getSceneX(), e.getSceneY()-50, 20);
+			mCircles.add(c);
+			c.setFill(m.getColor());
+			m.setObserver(c);
     		Text t = new Text(e.getSceneX()-9, e.getSceneY()-45,"M"+(ms.size()-1));
     		t.setStyle("-fx-font-weight: bold");
     		t.setFill(Color.WHITE);
     		canvas.getChildren().add(c);
     		canvas.getChildren().add(t);
     		c.setOnMouseReleased(ev -> {
-    			int i = 0;
+    			int i = 1;
     			double x = ev.getSceneX();
     			double y = ev.getSceneY() - 50;
     			for(; i<qRectangles.size(); i++) {
@@ -176,7 +254,7 @@ public class SimulatorController implements Initializable {
     		});
     		
     		t.setOnMouseReleased(ev -> {
-    			int i = 0;
+    			int i = 1;
     			double x = ev.getSceneX();
     			double y = ev.getSceneY() - 50;
     			for(; i<qRectangles.size(); i++) {
@@ -203,3 +281,4 @@ public class SimulatorController implements Initializable {
 
    
 }
+// The most beatiful Spaghetti design pattern code ever.

@@ -8,23 +8,28 @@ import java.util.concurrent.*;
 public class Q implements Runnable {
 	Queue<Product> products;
 	LinkedList<M> machines;
+	QueueObserver qObserver;
 
 	public Q() {
 		machines = new LinkedList<>();
 		products = new LinkedBlockingQueue<>();
 	}
 
-	public Q(LinkedList<M> m) {
+	public Q(LinkedList<M> m,QueueObserver queueObserver) {
+		qObserver=queueObserver;
 		machines = m;
 		products = new LinkedBlockingDeque<>();
 	}
-
+	public void setqObserver(QueueObserver qObserver) {
+		this.qObserver = qObserver;
+	}
 	public void addMachine(M machine) {
 		machines.add(machine);
 	}
 
 	public synchronized boolean addProduct(Product product) {
 		boolean boo = products.offer(product);
+		qObserver.update(Integer.toString(products.size()));
 		this.notify();
 		return boo;
 	}
@@ -58,7 +63,9 @@ public class Q implements Runnable {
 						e.printStackTrace();
 					}
 				}
+				qObserver.update(Integer.toString(products.size()));
 				machine.processProduct(product);
+				
 			}
 		}		
 	}

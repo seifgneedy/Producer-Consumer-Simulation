@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.*;
+
 import javafx.scene.paint.Color;
 
 public class M implements Runnable {
@@ -9,17 +10,21 @@ public class M implements Runnable {
 	boolean working;
 	Product currentProduct;
 	int workingTime;
-
+	MachineObserver cObserver;
 	public M() {
 		currentProduct = null;
 		workingTime = new Random().nextInt(7500);
 	}
 
-	public M(Q nextQ) {
+	public M(Q nextQ,MachineObserver circle) {
 		this();
+		cObserver=circle;
 		this.nextQ = nextQ;
 	}
 
+	public void setObserver(MachineObserver cObserver) {
+		this.cObserver = cObserver;
+	}
 	public void setNextQ(Q nextQ) {
 		this.nextQ = nextQ;
 	}
@@ -53,9 +58,20 @@ public class M implements Runnable {
 					}
 				}
 				try {
-					/// observer here 
+					//useProduct color and update
+					cObserver.update(currentProduct.getColor());
 					Thread.sleep(workingTime);
-					// flash color
+					//return to default color and update
+					cObserver.update(defaultColor);
+
+					Thread.sleep(200);
+					//useProduct color and update
+					cObserver.update(currentProduct.getColor());
+
+					Thread.sleep(200);
+					//return to default color and update
+					cObserver.update(defaultColor);
+
 					nextQ.addProduct(currentProduct);
 					currentProduct=null;
 				} catch (InterruptedException e) {
@@ -64,15 +80,5 @@ public class M implements Runnable {
 			}
 		}
 	}
-	
-	
-	
-	/**
-	public boolean consume() {
-		if(working) return false;
-		this.run();
-		return true;
-	}
-	**/
 	
 }
