@@ -10,6 +10,7 @@ public class QueueText extends Text implements QueueObserver {
     }
     @Override
     public void update(String text) {
+    	System.out.println(text);
         setText(text);
     }
     

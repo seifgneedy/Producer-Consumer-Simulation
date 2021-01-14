@@ -26,7 +26,13 @@ public class Q implements Runnable {
 	public void addMachine(M machine) {
 		machines.add(machine);
 	}
-
+	public int getSize() {
+		return products.size();
+	}
+	
+	public void clearProducts() {
+		products.clear();
+	}
 	public synchronized boolean addProduct(Product product) {
 		boolean boo = products.offer(product);
 		qObserver.update(Integer.toString(products.size()));
@@ -45,15 +51,13 @@ public class Q implements Runnable {
 	public void run() {
 		for (;;) {
 			synchronized (this) {
-				while (products.isEmpty()) {
+				while (products.isEmpty() || machines.isEmpty()) {
 					try {
 						this.wait();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
-
-				Product product = products.poll();
 				int randomNum = new Random().nextInt(machines.size());
 				M machine = machines.get(randomNum);
 				while (machine.isWorking()) {
@@ -63,9 +67,9 @@ public class Q implements Runnable {
 						e.printStackTrace();
 					}
 				}
-				qObserver.update(Integer.toString(products.size()));
+				Product product = products.poll();
 				machine.processProduct(product);
-				
+				qObserver.update(Integer.toString(products.size()));
 			}
 		}		
 	}

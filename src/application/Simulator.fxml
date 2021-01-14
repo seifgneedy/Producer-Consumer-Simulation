@@ -7,15 +7,21 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SimulatorController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SimulatorController">
    <top>
       <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #838c9c;" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="addQButton" layoutX="14.0" layoutY="13.0" mnemonicParsing="false" onMouseClicked="#addQueue" prefHeight="26.0" prefWidth="95.0" style="-fx-background-color: #e5e5e5;" text="Add Queue" />
+            <Button fx:id="addQButton" layoutX="14.0" layoutY="13.0" mnemonicParsing="false" onMouseClicked="#addQueue" prefHeight="26.0" prefWidth="95.0" text="Add Queue" />
             <Button fx:id="addMButton" layoutX="120.0" layoutY="13.0" mnemonicParsing="false" onAction="#addMachine" prefHeight="26.0" prefWidth="114.0" text="Add machine" />
             <Button layoutX="724.0" layoutY="13.0" mnemonicParsing="false" onAction="#closeClicked" prefWidth="62.0" text="Close " />
-            <TextField fx:id="textField" layoutX="439.0" layoutY="13.0" prefHeight="26.0" prefWidth="42.0" />
+            <TextField fx:id="textField" layoutX="409.0" layoutY="12.0" prefHeight="26.0" prefWidth="42.0" />
             <Label layoutX="261.0" layoutY="16.0" text="Number of products :">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="timeText" layoutX="584.0" layoutY="12.0" prefHeight="26.0" prefWidth="42.0" />
+            <Label layoutX="463.0" layoutY="16.0" prefHeight="20.0" prefWidth="121.0" text="Time interval in s">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -26,9 +32,9 @@
    <bottom>
       <AnchorPane maxHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" style="-fx-background-color: #838c9c;" BorderPane.alignment="CENTER">
          <children>
-            <Button layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#startSimulation" prefHeight="26.0" prefWidth="127.0" text="Start Simulation" />
-            <Button layoutX="182.0" layoutY="12.0" mnemonicParsing="false" onAction="#replaySimulation" prefHeight="26.0" prefWidth="153.0" text="Replay Simulation" />
-            <Button layoutX="651.0" layoutY="13.0" mnemonicParsing="false" onAction="#resetSimulation" text="Reset Simulation" />
+            <Button fx:id="startSimulationButton" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#startSimulation" prefHeight="26.0" prefWidth="127.0" text="Start Simulation" />
+            <Button fx:id="replaySimulationButton" layoutX="182.0" layoutY="12.0" mnemonicParsing="false" onAction="#replaySimulation" prefHeight="26.0" prefWidth="153.0" text="Replay Simulation" />
+            <Button fx:id="resetSimulatioButton" layoutX="651.0" layoutY="13.0" mnemonicParsing="false" onAction="#resetSimulation" text="Reset Simulation" />
          </children>
       </AnchorPane>
    </bottom>

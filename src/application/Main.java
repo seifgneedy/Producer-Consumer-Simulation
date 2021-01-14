@@ -14,7 +14,7 @@ public class Main extends Application {
 		Main.stage = primaryStage;
 		try {
 			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("Simulator.fxml"));
-			Scene scene = new Scene(root,400,400);
+			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setResizable(false);

@@ -20,6 +20,8 @@ public class SimulatorController implements Initializable {
 	@FXML
 	TextField textField;
 	@FXML
+	TextField timeText;
+	@FXML
 	Button addQButton;
 	@FXML
 	Button addMButton;
@@ -29,8 +31,6 @@ public class SimulatorController implements Initializable {
 	Button replaySimulationButton;
 	@FXML
 	Button resetSimulatioButton;
-	@FXML
-	Button resetButton;
 
 	CareTaker careTaker = new CareTaker();
 	Originator originator = new Originator();
@@ -65,7 +65,7 @@ public class SimulatorController implements Initializable {
 			for(; i<mCircles.size(); i++) {
 				MachineCircle c = mCircles.get(i);
 				if( c.intersects(x, y, 1, 1)) {
-					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+					if(!addQ && !addM && ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
 						q.addMachine(ms.get(i));
 						Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
 						canvas.getChildren().add(a);
@@ -80,7 +80,7 @@ public class SimulatorController implements Initializable {
 			for(; i<mCircles.size(); i++) {
 				MachineCircle c = mCircles.get(i);
 				if( c.intersects(x, y, 1, 1)) {
-					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+					if(!addQ && !addM && ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
 						q.addMachine(ms.get(i));
 						Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
 						canvas.getChildren().add(a);
@@ -106,6 +106,14 @@ public class SimulatorController implements Initializable {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				if (!newValue.matches("\\d*")) {
 					textField.setText(newValue.replaceAll("[^\\d]", ""));
+				}
+			}
+		});
+		timeText.textProperty().addListener((ChangeListener<? super String>) new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				if (!newValue.matches("\\d*")) {
+					timeText.setText(newValue.replaceAll("[^\\d]", ""));
 				}
 			}
 		});
@@ -141,22 +149,40 @@ public class SimulatorController implements Initializable {
     	}
 	}
 	
-	@FXML 
-	public void setMachineColor(M machine,Color color){
-		int index= ms.indexOf(machine);
-		mCircles.get(index).setFill(color);
-		//Save snapshot
-	}
+	
+//	public void setMachineColor(M machine,Color color){
+//		int index= ms.indexOf(machine);
+//		mCircles.get(index).setFill(color);
+//		//Save snapshot
+//	}
 
     @FXML
     public void startSimulation(){
+    	qTexts.get(1).setText("0");
+    	timeText.setDisable(true);
+    	textField.setDisable(true);
+    	int numberOfProducts = Integer.parseInt(textField.getText());
+    	addQButton.setDisable(true);
+    	addMButton.setDisable(true);
+    	startSimulationButton.setDisable(true);
+    	replaySimulationButton.setDisable(true);
 		for(Q q:qs)
 			new Thread(q).start();
 		for(M m:ms)
 			new Thread(m).start();
-		
-		
-
+		ProductFeeder pf = new ProductFeeder(qs.get(0), numberOfProducts, Integer.parseInt(timeText.getText()) * 1000 );
+		new Thread(pf).start();
+		EndSimulationDetector esd = new EndSimulationDetector(this, qs.get(1), numberOfProducts);
+		new Thread(esd).start();
+    }
+    public void simulationEnded() {
+    	timeText.setDisable(false);
+    	textField.setDisable(false);
+		addQButton.setDisable(false);
+    	addMButton.setDisable(false);
+    	startSimulationButton.setDisable(false);
+    	replaySimulationButton.setDisable(false);
+    	qs.get(1).clearProducts();
     }
 
     @FXML
@@ -182,92 +208,107 @@ public class SimulatorController implements Initializable {
     
     @FXML
     public void onPaneClicked(MouseEvent e) {
-    	if(addQ) {
-    		Q q = new Q();
-    		qs.add(q);
-    		Rectangle r = new Rectangle(e.getSceneX(), e.getSceneY()-50, 40, 30);
-    		r.setFill(Color.rgb(251, 251, 1));
-    		QueueText t = new QueueText(e.getSceneX() + 12, e.getSceneY()-30,"Q"+(qs.size()-1));
-    		t.setStyle("-fx-font-weight: bold");
-			t.setFill(Color.BLUE);
-			q.setqObserver(t);
-    		canvas.getChildren().add(r);
-    		canvas.getChildren().add(t);
-    		qTexts.add(t);
-			qRectangles.add(r);
-    		r.setOnMouseReleased(ev -> {
-				int i = 0;
-    			double x = ev.getSceneX();
-    			double y = ev.getSceneY() - 50;
-    			for(; i<mCircles.size(); i++) {
-    				MachineCircle c = mCircles.get(i);
-    				if( c.intersects(x, y, 1, 1)) {
-    					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
-	    					q.addMachine(ms.get(i));
-	    					Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
-	    					canvas.getChildren().add(a);
-    					}
-    				}
-    			}
-    		});
-    		t.setOnMouseReleased(ev -> {
-    			int i = 0;
-    			double x = ev.getSceneX();
-    			double y = ev.getSceneY() - 50;
-    			for(; i<mCircles.size(); i++) {
-    				MachineCircle c = mCircles.get(i);
-    				if( c.intersects(x, y, 1, 1)) {
-    					if( ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
-	    					q.addMachine(ms.get(i));
-	    					Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
-	    					canvas.getChildren().add(a);
-    					}
-    				}
-    			}
-    		});
-    	} else if(addM) {
-    		M m = new M();
-    		ms.add(m);
-    		MachineCircle c = new MachineCircle(e.getSceneX(), e.getSceneY()-50, 20);
-			mCircles.add(c);
-			c.setFill(m.getColor());
-			m.setObserver(c);
-    		Text t = new Text(e.getSceneX()-9, e.getSceneY()-45,"M"+(ms.size()-1));
-    		t.setStyle("-fx-font-weight: bold");
-    		t.setFill(Color.WHITE);
-    		canvas.getChildren().add(c);
-    		canvas.getChildren().add(t);
-    		c.setOnMouseReleased(ev -> {
-    			int i = 1;
-    			double x = ev.getSceneX();
-    			double y = ev.getSceneY() - 50;
-    			for(; i<qRectangles.size(); i++) {
-    				Rectangle r = qRectangles.get(i);
-    				if( r.intersects(x, y, 1, 1)) {
-    					if( m.getNextQ() == null && !qs.get(i).getMachines().contains(m)) {
-	    					m.setNextQ(qs.get(i));
-	    					Arrow a = new Arrow(c.getCenterX(), c.getCenterY(), r.getX()+20, r.getY()+15);
-	    					canvas.getChildren().add(a);
-    					}
-    				}
-    			}
-    		});
-    		
-    		t.setOnMouseReleased(ev -> {
-    			int i = 1;
-    			double x = ev.getSceneX();
-    			double y = ev.getSceneY() - 50;
-    			for(; i<qRectangles.size(); i++) {
-    				Rectangle r = qRectangles.get(i);
-    				if( r.intersects(x, y, 1, 1)) {
-    					if( m.getNextQ() == null && !qs.get(i).getMachines().contains(m)) {
-	    					m.setNextQ(qs.get(i));
-	    					Arrow a = new Arrow(c.getCenterX(), c.getCenterY(), r.getX()+20, r.getY()+15);
-	    					canvas.getChildren().add(a);
-    					}
-    				}
-    			}
-    		});
+    	boolean intersected =false; // no to draw shape onto anther shape    
+    	for(int i=0; i<mCircles.size(); i++) {
+			Circle c = mCircles.get(i);
+			if( c.intersects(e.getSceneX(), e.getSceneY()-50, 1, 1)) {
+		        intersected=true;
+			}
+		}
+		for(int i=0; i<qRectangles.size(); i++) {
+			Rectangle r = qRectangles.get(i);
+			if( r.intersects(e.getSceneX(), e.getSceneY()-50, 1, 1)) {
+				intersected=true;
+			}
+		}
+    	if(!intersected) {
+	    	if(addQ) {
+	    		Q q = new Q();
+	    		qs.add(q);
+	    		Rectangle r = new Rectangle(e.getSceneX(), e.getSceneY()-50, 40, 30);
+	    		r.setFill(Color.rgb(251, 251, 1));
+	    		QueueText t = new QueueText(e.getSceneX() + 12, e.getSceneY()-30,"Q"+(qs.size()-1));
+	    		t.setStyle("-fx-font-weight: bold");
+				t.setFill(Color.BLUE);
+				q.setqObserver(t);
+	    		canvas.getChildren().add(r);
+	    		canvas.getChildren().add(t);
+	    		qTexts.add(t);
+				qRectangles.add(r);
+	    		r.setOnMouseReleased(ev -> {
+					int i = 0;
+	    			double x = ev.getSceneX();
+	    			double y = ev.getSceneY() - 50;
+	    			for(; i<mCircles.size(); i++) {
+	    				MachineCircle c = mCircles.get(i);
+	    				if( c.intersects(x, y, 1, 1)) {
+	    					if(!addQ && !addM && ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+		    					q.addMachine(ms.get(i));
+		    					Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
+		    					canvas.getChildren().add(a);
+	    					}
+	    				}
+	    			}
+	    		});
+	    		t.setOnMouseReleased(ev -> {
+	    			int i = 0;
+	    			double x = ev.getSceneX();
+	    			double y = ev.getSceneY() - 50;
+	    			for(; i<mCircles.size(); i++) {
+	    				MachineCircle c = mCircles.get(i);
+	    				if( c.intersects(x, y, 1, 1)) {
+	    					if(!addQ && !addM && ! q.getMachines().contains(ms.get(i)) && (ms.get(i).getNextQ() == null || ! ms.get(i).getNextQ().equals(q)) ) {
+		    					q.addMachine(ms.get(i));
+		    					Arrow a = new Arrow(r.getX()+20, r.getY()+15, c.getCenterX(), c.getCenterY());
+		    					canvas.getChildren().add(a);
+	    					}
+	    				}
+	    			}
+	    		});
+	    	} else if(addM) {
+	    		M m = new M();
+	    		ms.add(m);
+	    		MachineCircle c = new MachineCircle(e.getSceneX(), e.getSceneY()-50, 20);
+				mCircles.add(c);
+				c.setFill(m.getColor());
+				m.setObserver(c);
+	    		Text t = new Text(e.getSceneX()-9, e.getSceneY()-45,"M"+(ms.size()-1));
+	    		t.setStyle("-fx-font-weight: bold");
+	    		t.setFill(Color.WHITE);
+	    		canvas.getChildren().add(c);
+	    		canvas.getChildren().add(t);
+	    		c.setOnMouseReleased(ev -> {
+	    			int i = 1;
+	    			double x = ev.getSceneX();
+	    			double y = ev.getSceneY() - 50;
+	    			for(; i<qRectangles.size(); i++) {
+	    				Rectangle r = qRectangles.get(i);
+	    				if( r.intersects(x, y, 1, 1)) {
+	    					if(!addQ && !addM && m.getNextQ() == null && !qs.get(i).getMachines().contains(m)) {
+		    					m.setNextQ(qs.get(i));
+		    					Arrow a = new Arrow(c.getCenterX(), c.getCenterY(), r.getX()+20, r.getY()+15);
+		    					canvas.getChildren().add(a);
+	    					}
+	    				}
+	    			}
+	    		});
+	    		
+	    		t.setOnMouseReleased(ev -> {
+	    			int i = 1;
+	    			double x = ev.getSceneX();
+	    			double y = ev.getSceneY() - 50;
+	    			for(; i<qRectangles.size(); i++) {
+	    				Rectangle r = qRectangles.get(i);
+	    				if( r.intersects(x, y, 1, 1)) {
+	    					if(!addQ && !addM && m.getNextQ() == null && !qs.get(i).getMachines().contains(m)) {
+		    					m.setNextQ(qs.get(i));
+		    					Arrow a = new Arrow(c.getCenterX(), c.getCenterY(), r.getX()+20, r.getY()+15);
+		    					canvas.getChildren().add(a);
+	    					}
+	    				}
+	    			}
+	    		});
+	    	}
     	}
     }
     

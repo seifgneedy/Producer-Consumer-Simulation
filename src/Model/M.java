@@ -13,7 +13,7 @@ public class M implements Runnable {
 	MachineObserver cObserver;
 	public M() {
 		currentProduct = null;
-		workingTime = new Random().nextInt(7500);
+		workingTime = new Random().nextInt(6500) + 1000;
 	}
 
 	public M(Q nextQ,MachineObserver circle) {
@@ -35,12 +35,13 @@ public class M implements Runnable {
 		return currentProduct.getColor();
 	}
 
-	public void processProduct(Product currentProduct) {
+	public synchronized void processProduct(Product currentProduct) {
 		this.currentProduct = currentProduct;
+		System.out.println("Machine will be notified");
 		this.notify();
 	}
 	public boolean isWorking() {
-		return currentProduct==null;
+		return currentProduct != null;
 	}
 	public Q getNextQ() {
 		return nextQ;
@@ -61,14 +62,14 @@ public class M implements Runnable {
 					//useProduct color and update
 					cObserver.update(currentProduct.getColor());
 					Thread.sleep(workingTime);
-					//return to default color and update
-					cObserver.update(defaultColor);
-
-					Thread.sleep(200);
-					//useProduct color and update
-					cObserver.update(currentProduct.getColor());
-
-					Thread.sleep(200);
+					for(int k=0; k<3; k++) {
+						//return to default color and update
+						cObserver.update(defaultColor);
+						Thread.sleep(200);
+						//useProduct color and update
+						cObserver.update(currentProduct.getColor());
+						Thread.sleep(200);
+					}
 					//return to default color and update
 					cObserver.update(defaultColor);
 
