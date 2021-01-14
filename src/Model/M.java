@@ -37,7 +37,6 @@ public class M implements Runnable {
 
 	public synchronized void processProduct(Product currentProduct) {
 		this.currentProduct = currentProduct;
-		System.out.println("Machine will be notified");
 		this.notify();
 	}
 	public boolean isWorking() {
